@@ -13,7 +13,9 @@ public class SchemaInitializer {
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
                     quantity REAL NOT NULL,
-                    unit TEXT NOT NULL
+                    unit TEXT NOT NULL,
+                    expiryDate DATE NOT NULL,
+                    creationDate DATETIME NOT NULL,
                     )
                     """);
 
