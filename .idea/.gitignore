@@ -1,8 +1,26 @@
-# Default ignored files
-/shelf/
-/workspace.xml
-# Editor-based HTTP Client requests
-/httpRequests/
-# Datasource local storage ignored files
-/dataSources/
-/dataSources.local.xml
+# Maven
+/target/
+*.log
+
+# SQLite databases
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Java
+*.class
+
+# Packaging / installers
+*.exe
+*.msi
+*.dmg
+*.pkg
