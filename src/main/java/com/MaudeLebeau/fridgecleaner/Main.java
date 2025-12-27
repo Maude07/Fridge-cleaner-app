@@ -1,4 +1,4 @@
-package com.MaudeLebeau.fridgeApp;
+package com.MaudeLebeau.fridgecleaner;
 
 public class Main {
     public static void main(String[] args) {

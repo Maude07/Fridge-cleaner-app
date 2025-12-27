@@ -1,4 +1,4 @@
-package com.MaudeLebeau.fridgeApp.repository;
+package com.MaudeLebeau.fridgecleaner.repository;
 
 import java.sql.Connection;
 import java.sql.Statement;
