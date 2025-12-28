@@ -14,7 +14,7 @@ public class Item {
     private LocalDate expiryDate;
     private LocalDateTime creationDate;
 
-    public Item(Long id, String name, BigDecimal quantity, Unit unit, LocalDate expiryDate, LocalDateTime creationDate) {
+    public Item(Long id, String name, BigDecimal quantity, Unit unit, LocalDate expiryDate) {
         this.Id = id;
         this.name = Objects.requireNonNull(name, "Item must have a name");
         this.quantity = Objects.requireNonNull(quantity, "Item must have a quantity");
