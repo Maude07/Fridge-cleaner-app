@@ -47,14 +47,12 @@
         </VBox>
     </left>
 
-    <!-- Zone centrale "swap" : on remplacera son contenu selon le bouton cliqué -->
     <center>
         <StackPane fx:id="contentPane" styleClass="content">
             <padding>
                 <Insets top="18" right="18" bottom="18" left="18"/>
             </padding>
 
-            <!-- Écran par défaut: Ajout rapide -->
             <VBox fx:id="quickAddView" spacing="14" maxWidth="720" styleClass="card">
                 <Label text="Ajout rapide d'un item" styleClass="headline"/>
 

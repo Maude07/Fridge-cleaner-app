@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.MaudeLebeau.fridgecleaner.ui.InventoryController"
+      spacing="12"
+      styleClass="card">
+
+    <padding>
+        <Insets top="18" right="18" bottom="18" left="18"/>
+    </padding>
+
+    <Label text="Inventaire" styleClass="headline"/>
+
+    <TableView fx:id="itemsTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="nameCol" text="Nom" prefWidth="240"/>
+            <TableColumn fx:id="qtyCol" text="Quantité" prefWidth="140"/>
+            <TableColumn fx:id="unitCol" text="Unité" prefWidth="120"/>
+            <TableColumn fx:id="expiryCol" text="Expiration" prefWidth="160"/>
+        </columns>
+    </TableView>
+
+</VBox>
