@@ -21,6 +21,10 @@ public class ItemService {
         repo.deleteItemById(item.getId());
     }
 
+    public boolean update(Item item) {
+        return repo.updateItem(item);
+    }
+
 
     public List<Item> listAll() {
         return repo.getAllItems();

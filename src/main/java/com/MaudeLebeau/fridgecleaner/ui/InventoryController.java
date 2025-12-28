@@ -3,15 +3,18 @@ package com.MaudeLebeau.fridgecleaner.ui;
 import com.MaudeLebeau.fridgecleaner.domain.Item;
 import com.MaudeLebeau.fridgecleaner.repository.ItemRepository;
 import com.MaudeLebeau.fridgecleaner.service.ItemService;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+
+import java.math.BigDecimal;
 
 public class InventoryController {
 
@@ -41,9 +44,13 @@ public class InventoryController {
 
             {
                 plusBtn.setOnAction(e -> {
-                    Item item = getTableView().getItems().get(getIndex());
-                    //TODO increment item
-                    System.out.println("PLUS on " + item.getName());
+                    Item item = getTableRow().getItem();
+                    if (item == null) {
+                        return ;
+                    }
+
+                    showAddQuantityDialog(item);
+                    refresh();
                 });
 
                 minusBtn.setOnAction(e -> {
@@ -74,4 +81,76 @@ public class InventoryController {
         items.setAll(itemService.listAll());
     }
 
+    private void showAddQuantityDialog(Item item) {
+        //TODO when updating quantity, update expiry_date, but keep old items and new items separate?
+        // ex: I have an old milk carton, but I just bought a new one, keep old expiry date until used all of it
+        Dialog<BigDecimal> dialog = new Dialog<>();
+        dialog.setTitle("Ajouter une quantite");
+        dialog.setHeaderText("Item: " + item.getName());
+
+        ButtonType addBtnType = new ButtonType("Ajouter", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(addBtnType, ButtonType.CANCEL);
+
+        TextField addField = new TextField();
+        addField.setPromptText("ex: 0.5");
+
+        Label currentLabel = new Label( "Actuel: " + item.getQuantity() + " " + item.getUnit());
+        Label previewLabel = new Label("Apres ajoute: -");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+
+        grid.addRow(0, new Label("Ajouter:"), addField);
+        grid.add(currentLabel, 0, 1, 2, 1);
+        grid.add(previewLabel, 0, 2, 2, 1);
+
+        dialog.getDialogPane().setContent(grid);
+
+        Node okButton = dialog.getDialogPane().lookupButton(addBtnType);
+
+        BooleanBinding invalid = Bindings.createBooleanBinding(() -> {
+            String txt = addField.getText() == null ? "" : addField.getText().trim();
+            if (txt.isEmpty()) {
+                previewLabel.setText("Apres ajout : -");
+                return true;
+            }
+            try {
+                BigDecimal add = new BigDecimal(txt);
+                if (add.compareTo(BigDecimal.ZERO) <= 0) {
+                    previewLabel.setText("Apres ajout : quantite invalide");
+                    return true;
+                }
+                BigDecimal after = item.getQuantity().add(add);
+                previewLabel.setText("Apres ajout: " + after + " " + item.getUnit());
+                return false;
+            } catch (NumberFormatException e) {
+                previewLabel.setText("Apres ajout : format invalide");
+                return true;
+            }
+        }, addField.textProperty());
+
+        okButton.disableProperty().bind(invalid);
+
+        dialog.setOnShown(evt -> addField.requestFocus());
+
+        dialog.setResultConverter(btn -> {
+            if (btn == addBtnType) {
+                return new BigDecimal(addField.getText().trim());
+            }
+            return null;
+        });
+
+        dialog.showAndWait().ifPresent(addQty -> {
+            BigDecimal sum = addQty.add(item.getQuantity());
+            itemService.update(new Item(
+                    item.getId(),
+                    item.getName(),
+                    sum,
+                    item.getUnit(),
+                    item.getExpiryDate(),
+                    item.getCreationDate()
+            ));
+        });
+    }
 }
