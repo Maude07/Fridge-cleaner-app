@@ -29,47 +29,22 @@ public class MainController {
 
     @FXML
     public void initialize() {
-        unitCombo.getItems().setAll(Unit.values());
-        unitCombo.getSelectionModel().select(Unit.PCS);
+        showHome();
     }
 
     @FXML
-    private void onAddItem() {
-        try {
-            String name = nameField.getText();
-            BigDecimal quantity = new BigDecimal(quantityField.getText().trim());
-            Unit unit = unitCombo.getValue();
-            LocalDate expiry = expiryPicker.getValue();
+    private void onHome() {
+        showHome();
+    }
 
-            Item item = new Item(null, name, quantity, unit, expiry);
-
-            Item saved = itemService.add(item);
-
-            statusLabel.setText("Added: " + saved.getName());
-
-            nameField.clear();
-            quantityField.clear();
-            expiryPicker.setValue(null);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            statusLabel.setText("Erreur: " + e.getMessage());
-        }
+    @FXML
+    private void showHome() {
+        loadView("/com/MaudeLebeau/fridgecleaner/ui/HomeView.fxml", "Accueil");
     }
 
     @FXML
     private void onInventory() {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/com/MaudeLebeau/fridgecleaner/ui/InventoryView.fxml")
-            );
-            Parent view = loader.load();
-            contentPane.getChildren().setAll(view);
-            statusLabel.setText("Inventaire");
-    } catch (Exception e) {
-        e.printStackTrace();
-        statusLabel.setText("Erreur de chargement d'inventaire ");
-        }
+        loadView("/com/MaudeLebeau/fridgecleaner/ui/InventoryView.fxml", "Inventaire");
     }
 
     @FXML
@@ -95,5 +70,16 @@ public class MainController {
     @FXML
     private void onQuickImport() {
         statusLabel.setText("Importer recette (a faire)");
+    }
+
+    private void loadView(String fxml, String title) {
+        try {
+            Parent view = FXMLLoader.load(getClass().getResource(fxml));
+            contentPane.getChildren().setAll(view);
+            statusLabel.setText(title);
+        } catch (Exception e) {
+            e.printStackTrace();
+            statusLabel.setText("Erreur de chargement : " + title);
+        }
     }
 }

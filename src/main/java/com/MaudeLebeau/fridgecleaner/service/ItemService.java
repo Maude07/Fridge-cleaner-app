@@ -3,6 +3,8 @@ package com.MaudeLebeau.fridgecleaner.service;
 import com.MaudeLebeau.fridgecleaner.domain.Item;
 import com.MaudeLebeau.fridgecleaner.repository.ItemRepository;
 
+import java.util.List;
+
 public class ItemService {
     private final ItemRepository repo;
 
@@ -13,5 +15,9 @@ public class ItemService {
     public Item add(Item item) {
         //TODO ajouter verifications si necessaire
         return repo.addItem(item);
+    }
+
+    public List<Item> listAll() {
+        return repo.getAllItems();
     }
 }

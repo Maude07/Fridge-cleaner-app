@@ -1,8 +1,12 @@
 package com.MaudeLebeau.fridgecleaner.repository;
 
 import com.MaudeLebeau.fridgecleaner.domain.Item;
+import com.MaudeLebeau.fridgecleaner.domain.Unit;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItemRepository {
 
@@ -52,6 +56,37 @@ public class ItemRepository {
             throw new RuntimeException("Error inserting item", e);
         }
     }
+
+    public List<Item> getAllItems() {
+        String sql = """
+                SELECT id, name, quantity, unit, expiry_date, creation_date
+                FROM items
+                """;
+
+        List<Item> items = new ArrayList<>();
+
+        try (Connection conn = DatabaseManager.getConnection();
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Item item = new Item(
+                        rs.getLong("id"),
+                        rs.getString("name"),
+                        rs.getBigDecimal("quantity"),
+                        Unit.valueOf(rs.getString("unit")),
+                        rs.getString("expiry_date") != null
+                            ? LocalDate.parse(rs.getString("expiry_date"))
+                            : null
+                );
+
+                items.add(item);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching items", e);
+        }
+        return items;
+    }
+
 
     public boolean updateItem(Item item) {
 

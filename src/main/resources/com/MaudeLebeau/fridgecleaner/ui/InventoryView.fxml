@@ -19,7 +19,7 @@
     <TableView fx:id="itemsTable" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="nameCol" text="Nom" prefWidth="240"/>
-            <TableColumn fx:id="qtyCol" text="Quantité" prefWidth="140"/>
+            <TableColumn fx:id="quantityCol" text="Quantité" prefWidth="140"/>
             <TableColumn fx:id="unitCol" text="Unité" prefWidth="120"/>
             <TableColumn fx:id="expiryCol" text="Expiration" prefWidth="160"/>
         </columns>
