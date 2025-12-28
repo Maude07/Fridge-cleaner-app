@@ -47,9 +47,10 @@ public class InventoryController {
                 });
 
                 minusBtn.setOnAction(e -> {
-                    Item item = getTableView().getItems().get(getIndex());
+                    Item item = getTableRow().getItem();
                     itemService.delete(item);
                     System.out.println("MINUS on " + item.getName());
+                    refresh();
                 });
             }
 

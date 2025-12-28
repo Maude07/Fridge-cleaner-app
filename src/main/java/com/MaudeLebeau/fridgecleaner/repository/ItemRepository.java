@@ -57,6 +57,42 @@ public class ItemRepository {
         }
     }
 
+    public Item getItemById(Long id) {
+        String sql = """
+                SELECT id, name, quantity, unit, expiry_date, creation_date
+                FROM items
+                WHERE id = ?
+                """;
+
+        try (Connection conn = DatabaseManager.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (!rs.next()) {
+                    return null;
+                }
+
+                System.out.println("Rs:" + rs);
+
+
+                return new Item(
+                        rs.getLong("id"),
+                        rs.getString("name"),
+                        rs.getBigDecimal("quantity"),
+                        Unit.valueOf(rs.getString("unit")),
+                        rs.getString("expiry_date") != null
+                                ? LocalDate.parse(rs.getString("expiry_date"))
+                                : null,
+                        rs.getTimestamp("creation_date").toLocalDateTime()
+                );
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting item by id", e);
+        }
+    }
+
     public List<Item> getAllItems() {
         String sql = """
                 SELECT id, name, quantity, unit, expiry_date, creation_date
@@ -140,7 +176,6 @@ public class ItemRepository {
         PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setLong(1, id);
-
             int rows = stmt.executeUpdate();
             return rows == 1;
 

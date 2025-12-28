@@ -42,4 +42,9 @@
         <HBox HBox.hgrow="ALWAYS"/>
     </HBox>
 
+    <Label fx:id="statusLabel"
+           text=""
+           wrapText="true"
+           styleClass="status-message"/>
+
 </VBox>

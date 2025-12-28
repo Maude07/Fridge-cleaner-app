@@ -25,9 +25,20 @@ public class Item {
             throw new IllegalArgumentException("Quantity must be >= than zero");
         }
 
-        if (name.isBlank()) {
-            throw new IllegalArgumentException("Item must have a name");
+    }
+
+    public Item(Long id, String name, BigDecimal quantity, Unit unit, LocalDate expiryDate, LocalDateTime creationDate) {
+        this.Id = id;
+        this.name = Objects.requireNonNull(name, "Item must have a name");
+        this.quantity = Objects.requireNonNull(quantity, "Item must have a quantity");
+        this.unit = Objects.requireNonNull(unit, "Item must have a unit");
+        this.expiryDate = expiryDate;
+        this.creationDate = Objects.requireNonNull(creationDate, "Item must have a date");
+
+        if (quantity.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Quantity must be >= than zero");
         }
+
     }
 
     public Long getId() {
