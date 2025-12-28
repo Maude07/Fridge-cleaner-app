@@ -1,6 +1,5 @@
 package com.MaudeLebeau.fridgecleaner.ui;
 
-import com.MaudeLebeau.fridgecleaner.domain.Item;
 import com.MaudeLebeau.fridgecleaner.domain.Unit;
 import com.MaudeLebeau.fridgecleaner.repository.ItemRepository;
 import com.MaudeLebeau.fridgecleaner.service.ItemService;
@@ -12,9 +11,6 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 public class MainController {
 
