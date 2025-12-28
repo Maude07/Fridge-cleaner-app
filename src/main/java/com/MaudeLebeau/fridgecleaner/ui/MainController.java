@@ -14,14 +14,9 @@ import javafx.scene.layout.StackPane;
 
 public class MainController {
 
-    @FXML private TextField nameField;
-    @FXML private TextField quantityField;
-    @FXML private ComboBox<Unit> unitCombo;
-    @FXML private DatePicker expiryPicker;
     @FXML private Label statusLabel;
     @FXML private StackPane contentPane;
 
-    private final ItemService itemService = new ItemService(new ItemRepository());
 
     @FXML
     public void initialize() {

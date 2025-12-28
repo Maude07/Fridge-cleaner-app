@@ -109,3 +109,36 @@
 .secondary-button:hover {
     -fx-background-color: #BDDFFF;
 }
+
+.actions-box {
+    -fx-alignment: center;
+}
+
+.qty-plus, .qty-minus {
+    -fx-min-width: 26px;
+    -fx-min-height: 26px;
+    -fx-max-width: 26px;
+    -fx-max-height: 26px;
+
+    -fx-background-radius: 8px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.qty-plus {
+    -fx-background-color: #D9FBE5; /* vert pastel */
+    -fx-text-fill: #167A3E;
+}
+
+.qty-plus:hover {
+    -fx-background-color: #BFF4D3;
+}
+
+.qty-minus {
+    -fx-background-color: #FFE1E6; /* rouge/rose pastel */
+    -fx-text-fill: #A3162C;
+}
+
+.qty-minus:hover {
+    -fx-background-color: #FFC9D2;
+}

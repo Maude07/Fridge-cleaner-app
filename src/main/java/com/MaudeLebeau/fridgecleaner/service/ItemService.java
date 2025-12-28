@@ -17,6 +17,11 @@ public class ItemService {
         return repo.addItem(item);
     }
 
+    public void delete(Item item) {
+        repo.deleteItemById(item.getId());
+    }
+
+
     public List<Item> listAll() {
         return repo.getAllItems();
     }

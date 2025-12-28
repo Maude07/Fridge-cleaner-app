@@ -22,6 +22,7 @@
             <TableColumn fx:id="quantityCol" text="Quantité" prefWidth="140"/>
             <TableColumn fx:id="unitCol" text="Unité" prefWidth="120"/>
             <TableColumn fx:id="expiryCol" text="Expiration" prefWidth="160"/>
+            <TableColumn fx:id="actionsCol" prefWidth="90"/>
         </columns>
     </TableView>
 
