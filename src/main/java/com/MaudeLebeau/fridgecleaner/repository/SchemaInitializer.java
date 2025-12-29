@@ -17,7 +17,28 @@ public class SchemaInitializer {
                     unit TEXT NOT NULL,
                     expiry_date DATE,
                     creation_date DATETIME NOT NULL
-                    )
+                    );
+                    """);
+
+            stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS recipes (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    servings INTEGER NOT NULL CHECK (servings > 0)
+                    );
+                    """);
+
+            stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS recipe_ingredients (
+                    recipe_id INTEGER NOT NULL,
+                    item_id INTEGER NOT NULL,
+                    quantity REAL NOT NULL CHECK (quantity > 0),
+                    unit TEXT NOT NULL,
+                    
+                    PRIMARY KEY (recipe_id, item_id),
+                    FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
+                    FOREIGN KEY (item_id) REFERENCES items(id)
+                    );
                     """);
 
         } catch (Exception e) {

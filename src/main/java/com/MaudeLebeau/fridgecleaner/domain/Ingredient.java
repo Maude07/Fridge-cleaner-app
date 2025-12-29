@@ -17,4 +17,16 @@ public class Ingredient {
             throw new IllegalArgumentException("Quantity must be >= than zero");
         }
     }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public BigDecimal getQuantity() {
+        return quantity;
+    }
+
+    public Unit getUnit() {
+        return unit;
+    }
 }

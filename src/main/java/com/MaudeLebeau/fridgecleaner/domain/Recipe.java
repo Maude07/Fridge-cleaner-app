@@ -19,4 +19,20 @@ public class Recipe {
             throw new IllegalArgumentException("Recipe must have at least one serving");
         }
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Integer getServing() {
+        return serving;
+    }
+
+    public List<Ingredient> getIngredientList() {
+        return ingredientList;
+    }
 }

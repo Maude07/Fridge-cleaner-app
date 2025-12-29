@@ -33,8 +33,7 @@ public class MainController {
     }
 
     @FXML
-    private void onRecipes() {
-            statusLabel.setText("Recettes (a faire)");
+    private void onRecipes() { loadView("/com/MaudeLebeau/fridgecleaner/ui/RecipeView.fxml", "Recettes");
         }
 
     @FXML

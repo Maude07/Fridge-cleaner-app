@@ -48,7 +48,7 @@ public class ItemRepository {
                             item.getExpiryDate()
                     );
                 } else {
-                    throw new SQLException("Failed to retrieve generated ID");
+                    throw new SQLException("Failed to retrieve item generated ID");
                 }
             }
 
@@ -73,9 +73,6 @@ public class ItemRepository {
                 if (!rs.next()) {
                     return null;
                 }
-
-                System.out.println("Rs:" + rs);
-
 
                 return new Item(
                         rs.getLong("id"),
