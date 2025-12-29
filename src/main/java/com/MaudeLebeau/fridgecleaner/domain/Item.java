@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Item {
-    private final Long Id;
+    private final Long id;
     private final String name;
     private BigDecimal quantity;
     private Unit unit;
@@ -14,7 +14,7 @@ public class Item {
     private LocalDateTime creationDate;
 
     public Item(Long id, String name, BigDecimal quantity, Unit unit, LocalDate expiryDate) {
-        this.Id = id;
+        this.id = id;
         this.name = Objects.requireNonNull(name, "Item must have a name");
         this.quantity = Objects.requireNonNull(quantity, "Item must have a quantity");
         this.unit = Objects.requireNonNull(unit, "Item must have a unit");
@@ -28,7 +28,7 @@ public class Item {
     }
 
     public Item(Long id, String name, BigDecimal quantity, Unit unit, LocalDate expiryDate, LocalDateTime creationDate) {
-        this.Id = id;
+        this.id = id;
         this.name = Objects.requireNonNull(name, "Item must have a name");
         this.quantity = Objects.requireNonNull(quantity, "Item must have a quantity");
         this.unit = Objects.requireNonNull(unit, "Item must have a unit");
@@ -42,7 +42,7 @@ public class Item {
     }
 
     public Long getId() {
-        return Id;
+        return id;
     }
 
     public String getName() {
