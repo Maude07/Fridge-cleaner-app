@@ -74,14 +74,15 @@ public class ItemRepository {
                     return null;
                 }
 
+                Date expirySql = rs.getDate("expiry_date");
+                LocalDate expiryDate = (expirySql != null) ? expirySql.toLocalDate() : null;
+
                 return new Item(
                         rs.getLong("id"),
                         rs.getString("name"),
                         rs.getBigDecimal("quantity"),
                         Unit.valueOf(rs.getString("unit")),
-                        rs.getString("expiry_date") != null
-                                ? LocalDate.parse(rs.getString("expiry_date"))
-                                : null,
+                        expiryDate,
                         rs.getTimestamp("creation_date").toLocalDateTime()
                 );
             }
@@ -102,14 +103,15 @@ public class ItemRepository {
         PreparedStatement stmt = conn.prepareStatement(sql);
         ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
+
+                Date expirySql = rs.getDate("expiry_date");
+                LocalDate expiryDate = (expirySql != null) ? expirySql.toLocalDate() : null;
                 Item item = new Item(
                         rs.getLong("id"),
                         rs.getString("name"),
                         rs.getBigDecimal("quantity"),
                         Unit.valueOf(rs.getString("unit")),
-                        rs.getString("expiry_date") != null
-                            ? LocalDate.parse(rs.getString("expiry_date"))
-                            : null
+                        expiryDate
                 );
 
                 items.add(item);

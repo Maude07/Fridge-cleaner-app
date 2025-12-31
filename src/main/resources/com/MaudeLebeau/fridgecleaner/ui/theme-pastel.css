@@ -79,6 +79,12 @@
     -fx-text-fill: #2D2A32;
 }
 
+.sub-headline {
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #2D2A32;
+}
+
 .body-text {
     -fx-font-size: 13px;
     -fx-text-fill: #554D62;
