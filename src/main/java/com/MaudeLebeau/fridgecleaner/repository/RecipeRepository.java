@@ -6,12 +6,13 @@ import com.MaudeLebeau.fridgecleaner.domain.Unit;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class RecipeRepository {
     public Recipe addRecipe(Recipe recipe) {
         String recipeSql = """
-                INSERT INTO recipes (name, servings)
-                VALUES (?, ?)
+                INSERT INTO recipes (name, instructions, servings)
+                VALUES (?, ?, ?)
                 """;
 
         String ingredientSql = """
@@ -27,12 +28,13 @@ public class RecipeRepository {
 
                 try (PreparedStatement stmt = conn.prepareStatement(recipeSql, Statement.RETURN_GENERATED_KEYS)) {
                     stmt.setString(1, recipe.getName());
-                    stmt.setInt(2, recipe.getServing());
+                    stmt.setString(2, recipe.getInstructions());
+                    stmt.setInt(3, recipe.getServing());
                     stmt.executeUpdate();
 
                     try (ResultSet keys = stmt.getGeneratedKeys()) {
                         if (!keys.next()) {
-                            throw new SQLException("Faile to retrieve recipe generated ID");
+                            throw new SQLException("Failed to retrieve recipe generated ID");
                         }
                         recipeId = keys.getLong(1);
                     }
@@ -53,7 +55,7 @@ public class RecipeRepository {
 
                 conn.commit();
 
-                return new Recipe(recipeId, recipe.getName(), recipe.getServing(), recipe.getIngredientList());
+                return new Recipe(recipeId, recipe.getName(), recipe.getInstructions(), recipe.getServing(), recipe.getIngredientList());
 
             } catch (SQLException e) {
                 conn.rollback();
@@ -62,7 +64,7 @@ public class RecipeRepository {
                 conn.setAutoCommit(true);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error inserting reciep", e);
+            throw new RuntimeException("Error inserting recipe", e);
         }
     }
 
@@ -92,6 +94,7 @@ public class RecipeRepository {
                     baseRecipe = new Recipe(
                             rs.getLong("id"),
                             rs.getString("name"),
+                            rs.getString("instructions"),
                             rs.getInt("servings"),
                             new ArrayList<>()
                     );
@@ -118,5 +121,13 @@ public class RecipeRepository {
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting ingredient", e);
         }
+    }
+
+    public List<Recipe> getAllRecipes() {
+        String sql = """
+                SELECT id, name, instructions, servings FROM recipes
+                """;
+
+
     }
 }

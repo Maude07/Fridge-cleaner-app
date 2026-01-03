@@ -25,6 +25,9 @@ public class ItemService {
         return repo.updateItem(item);
     }
 
+    public Item findItemByName(String name) {
+        return repo.getItemByName(name);
+    }
 
     public List<Item> listAll() {
         return repo.getAllItems();

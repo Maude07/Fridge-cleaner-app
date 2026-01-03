@@ -24,6 +24,7 @@ public class SchemaInitializer {
                     CREATE TABLE IF NOT EXISTS recipes (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
+                    instructions TEXT NOT NULL,
                     servings INTEGER NOT NULL CHECK (servings > 0)
                     );
                     """);

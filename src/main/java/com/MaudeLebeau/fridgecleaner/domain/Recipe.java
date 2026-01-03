@@ -8,10 +8,12 @@ public class Recipe {
     private final String name;
     private Integer serving;
     private List<Ingredient> ingredientList;
+    private String instructions;
 
-    public Recipe(Long id, String name, Integer serving, List<Ingredient> ingredientList) {
+    public Recipe(Long id, String name, String instructions, Integer serving, List<Ingredient> ingredientList) {
         this.id = id;
         this.name = Objects.requireNonNull(name, "Recipe must have a name");
+        this.instructions = Objects.requireNonNull(instructions, "Recipe must have instructions");
         this.serving = Objects.requireNonNull(serving, "Servings can't be null");
         this.ingredientList = Objects.requireNonNull(ingredientList, "Recipe must have ingredients");
 
@@ -22,6 +24,10 @@ public class Recipe {
 
     public Long getId() {
         return id;
+    }
+
+    public String getInstructions() {
+        return instructions;
     }
 
     public String getName() {

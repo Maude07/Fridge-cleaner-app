@@ -91,6 +91,40 @@ public class ItemRepository {
         }
     }
 
+    public Item getItemByName(String name) {
+        String sql = """
+                SELECT id, name, quantity, unit, expiry_date, creation_date
+                FROM items
+                WHERE name = ?
+                """;
+
+        try (Connection conn = DatabaseManager.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, name);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (!rs.next()) {
+                    return null;
+                }
+
+                Date expirySql = rs.getDate("expiry_date");
+                LocalDate expiryDate = (expirySql != null) ? expirySql.toLocalDate() : null;
+
+                return new Item(
+                        rs.getLong("id"),
+                        name,
+                        rs.getBigDecimal("quantity"),
+                        Unit.valueOf(rs.getString("unit")),
+                        expiryDate,
+                        rs.getTimestamp("creation_date").toLocalDateTime()
+                );
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error getting item by name", e);
+        }
+    }
+
     public List<Item> getAllItems() {
         String sql = """
                 SELECT id, name, quantity, unit, expiry_date, creation_date

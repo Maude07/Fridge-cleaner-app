@@ -1,21 +1,24 @@
 package com.MaudeLebeau.fridgecleaner.ui;
 
+import com.MaudeLebeau.fridgecleaner.domain.Ingredient;
 import com.MaudeLebeau.fridgecleaner.domain.Item;
+import com.MaudeLebeau.fridgecleaner.domain.Recipe;
 import com.MaudeLebeau.fridgecleaner.domain.Unit;
 import com.MaudeLebeau.fridgecleaner.repository.ItemRepository;
+import com.MaudeLebeau.fridgecleaner.repository.RecipeRepository;
 import com.MaudeLebeau.fridgecleaner.service.ItemService;
+import com.MaudeLebeau.fridgecleaner.service.RecipeService;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HomeController {
 
@@ -25,16 +28,51 @@ public class HomeController {
     @FXML private DatePicker expiryPicker;
     @FXML private TextField recipeNameField;
     @FXML private TextField servingsField;
+    @FXML private TextArea recipeInstructionsField;
     @FXML private Label statusLabel;
     @FXML private VBox ingredientsBox;
 
     private final ItemService itemService = new ItemService(new ItemRepository());
-
+    private final RecipeService recipeService = new RecipeService(new RecipeRepository());
 
     @FXML
     public void initialize() {
         unitCombo.getItems().setAll(Unit.values());
         addIngredientRow();
+    }
+
+    public List<Ingredient> collectIngredients() {
+        List<Ingredient> ingredients = new ArrayList<>();
+
+        for (Node node : ingredientsBox.getChildren()) {
+            HBox row = (HBox) node;
+
+            TextField nameField = (TextField) row.getChildren().get(0);
+            TextField quantityField = (TextField) row.getChildren().get(1);
+            @SuppressWarnings("unchecked")
+            ComboBox<Unit> unitBox = (ComboBox<Unit>) row.getChildren().get(2);
+
+            String name = nameField.getText().trim();
+            String quantityRaw = quantityField.getText().trim();
+            Unit unit = unitBox.getValue();
+
+            if (name.isEmpty() && quantityRaw.isEmpty() && unit == null) continue;
+
+            //TODO generer une erreur UI si les entrees sont partielles
+            if (name.isEmpty() || quantityRaw.isEmpty() || unit == null) continue;
+
+            BigDecimal quantity = new BigDecimal(quantityRaw);
+            Long ingredientId = itemService.findItemByName(name).getId();
+
+            ingredients.add(new Ingredient(
+                    ingredientId,
+                    name,
+                    quantity,
+                    unit
+            ));
+        }
+
+        return ingredients;
     }
 
     @FXML
@@ -63,9 +101,33 @@ public class HomeController {
 
     @FXML
     private void onAddRecipe() {
-        String name = recipeNameField.getText();
-        Integer servings = Integer.parseInt(servingsField.getText());
+        try {
+            String name = recipeNameField.getText();
+            Integer servings = Integer.parseInt(servingsField.getText());
+            String recipeInstructions = recipeInstructionsField.getText();
 
+            List<Ingredient> ingredients = collectIngredients();
+
+            Recipe recipe = new Recipe(
+                    null,
+                    name,
+                    recipeInstructions,
+                    servings,
+                    ingredients
+            );
+
+            Recipe saved = recipeService.addRecipe(recipe);
+
+            statusLabel.setText("Added: " + saved.getName());
+
+            recipeNameField.clear();
+            servingsField.clear();
+            recipeInstructionsField.clear();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            statusLabel.setText("Erreur: " + e.getMessage());
+        }
     }
 
     private void addIngredientRow() {
