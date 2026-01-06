@@ -4,14 +4,12 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 public class Ingredient {
-    private final Long id;
-    private final String itemName;
+    private Product product;
     private BigDecimal quantity;
     private Unit unit;
 
-    public Ingredient(Long id, String itemName, BigDecimal quantity, Unit unit) {
-        this.id = id;
-        this.itemName = Objects.requireNonNull(itemName, "Item must have a name");
+    public Ingredient(Product product, BigDecimal quantity, Unit unit) {
+        this.product= Objects.requireNonNull(product, "Item must have a name");
         this.quantity = Objects.requireNonNull(quantity, "Recipe must have a quantity");
         this.unit = Objects.requireNonNull(unit, "Ingredient must have a unit");
 
@@ -20,12 +18,8 @@ public class Ingredient {
         }
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getItemName() {
-        return itemName;
+    public Product getProduct() {
+        return product;
     }
 
     public BigDecimal getQuantity() {
@@ -34,5 +28,11 @@ public class Ingredient {
 
     public Unit getUnit() {
         return unit;
+    }
+
+    @Override public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Ingredient other)) return false;
+        return product.getId().equals(other.product.getId());
     }
 }

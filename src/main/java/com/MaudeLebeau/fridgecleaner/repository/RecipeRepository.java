@@ -1,22 +1,26 @@
 package com.MaudeLebeau.fridgecleaner.repository;
 
-import com.MaudeLebeau.fridgecleaner.domain.Ingredient;
-import com.MaudeLebeau.fridgecleaner.domain.Recipe;
-import com.MaudeLebeau.fridgecleaner.domain.Unit;
+import com.MaudeLebeau.fridgecleaner.domain.*;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RecipeRepository {
+
+    ProductRepository productRepository;
+    ItemRepository itemRepository;
+
     public Recipe addRecipe(Recipe recipe) {
         String recipeSql = """
-                INSERT INTO recipes (name, instructions, servings)
+                INSERT INTO recipes (name, servings, instructions)
                 VALUES (?, ?, ?)
                 """;
 
         String ingredientSql = """
-                INSERT INTO recipe_ingredients(recipe_id, item_id, quantity, unit)
+                INSERT INTO recipe_ingredients(recipe_id, product_id, quantity, unit)
                 VALUES (?, ?, ?, ?)
                 """;
 
@@ -28,8 +32,8 @@ public class RecipeRepository {
 
                 try (PreparedStatement stmt = conn.prepareStatement(recipeSql, Statement.RETURN_GENERATED_KEYS)) {
                     stmt.setString(1, recipe.getName());
-                    stmt.setString(2, recipe.getInstructions());
-                    stmt.setInt(3, recipe.getServing());
+                    stmt.setInt(2, recipe.getServings());
+                    stmt.setString(3, recipe.getInstructions());
                     stmt.executeUpdate();
 
                     try (ResultSet keys = stmt.getGeneratedKeys()) {
@@ -44,7 +48,7 @@ public class RecipeRepository {
                     try (PreparedStatement stmt = conn.prepareStatement(ingredientSql)) {
                         for (Ingredient ing : recipe.getIngredientList()) {
                             stmt.setLong(1, recipeId);
-                            stmt.setLong(2, ing.getId());
+                            stmt.setLong(2, ing.getProduct().getId());
                             stmt.setBigDecimal(3, ing.getQuantity());
                             stmt.setString(4, ing.getUnit().toString());
                             stmt.addBatch();
@@ -55,7 +59,7 @@ public class RecipeRepository {
 
                 conn.commit();
 
-                return new Recipe(recipeId, recipe.getName(), recipe.getInstructions(), recipe.getServing(), recipe.getIngredientList());
+                return new Recipe(recipeId, recipe.getName(), recipe.getServings(), recipe.getInstructions(), recipe.getIngredientList());
 
             } catch (SQLException e) {
                 conn.rollback();
@@ -70,17 +74,17 @@ public class RecipeRepository {
 
     public Recipe getRecipeById(Long id) {
         String recipeSql = """
-                SELECT id, name, servings FROM recipes WHERE id = ?
+                SELECT id, name, servings, instructions FROM recipes WHERE id = ?
                 """;
 
         String ingredientsSql = """
-                SELECT i.id AS item_id,
-                i.name AS item_name,
-                ri.quantity, ri.unit
+                SELECT p.id AS product_id,
+                       p.name AS product_name,
+                       ri.quantity, ri.unit
                 FROM recipe_ingredients ri
-                JOIN items i ON i.id = ri.item_id
+                JOIN products p ON p.id = ri.product_id
                 WHERE ri.recipe_id = ?
-                ORDER BY i.name
+                ORDER BY p.name
                 """;
 
         try (Connection conn = DatabaseManager.getConnection()) {
@@ -94,8 +98,8 @@ public class RecipeRepository {
                     baseRecipe = new Recipe(
                             rs.getLong("id"),
                             rs.getString("name"),
-                            rs.getString("instructions"),
                             rs.getInt("servings"),
+                            rs.getString("instructions"),
                             new ArrayList<>()
                     );
                 }
@@ -105,9 +109,11 @@ public class RecipeRepository {
                 stmt.setLong(1, id);
                 try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
+
+                            Product product = productRepository.getProductById(rs.getLong("product_id"));
+
                         Ingredient ing = new Ingredient(
-                                rs.getLong("item_id"),
-                                rs.getString("item_name"),
+                                product,
                                 rs.getBigDecimal("quantity"),
                                 Unit.valueOf(rs.getString("unit"))
                         );
@@ -125,9 +131,82 @@ public class RecipeRepository {
 
     public List<Recipe> getAllRecipes() {
         String sql = """
-                SELECT id, name, instructions, servings FROM recipes
+                SELECT r.id, r.name, r.servings, r.instructions,
+                    p.id AS product_id,
+                    p.name AS product_name,
+                    p.default_unit AS product_default_unit,
+                    ri.quantity, ri.unit
+                FROM recipes r
+                LEFT JOIN recipe_ingredients ri ON ri.recipe_id = r.id
+                LEFT JOIN products p ON p.id = ri.product_id
+                ORDER BY r.id, p.name
                 """;
 
+        Map<Long, Recipe> byId = new LinkedHashMap<>();
 
+        try (Connection conn = DatabaseManager.getConnection();
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                long recipeId = rs.getLong("id");
+
+                Recipe recipe = byId.get(recipeId);
+                if (recipe == null) {
+                    recipe = new Recipe(
+                            recipeId,
+                            rs.getString("name"),
+                            rs.getInt("servings"),
+                            rs.getString("instructions"),
+                            new ArrayList<>()
+                    );
+                    byId.put(recipeId, recipe);
+                }
+
+                Object rawProductId = rs.getObject("product_id");
+                Long productId = (rawProductId == null) ? null : ((Number) rawProductId).longValue();
+
+                if (productId != null) {
+                    Product product = new Product(
+                            productId,
+                            rs.getString("product_name"),
+                            rs.getString("product_default_unit") == null
+                                ? null
+                                : Unit.valueOf(rs.getString("product_default_unit"))
+                    );
+
+                    Ingredient ing = new Ingredient(
+                            product,
+                            rs.getBigDecimal("quantity"),
+                            Unit.valueOf(rs.getString("unit"))
+                    );
+                    recipe.getIngredientList().add(ing);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching recipes", e);
+        }
+        return new ArrayList<>(byId.values());
+    }
+
+    public Boolean deleteRecipeById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Cannot delete recipe without Id");
+        }
+
+        String sql = """
+                DELETE FROM recipes WHERE id = ?
+                """;
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+            int rows = stmt.executeUpdate();
+            return rows == 1;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error deleting recipe id = " + id, e);
+        }
     }
 }

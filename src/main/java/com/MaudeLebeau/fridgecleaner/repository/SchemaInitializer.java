@@ -10,13 +10,22 @@ public class SchemaInitializer {
 
              Statement stmt = conn.createStatement()) {
             stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS products (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        name TEXT NOT NULL UNIQUE,
+                        default_unit TEXT
+                    );
+                    """);
+
+            stmt.execute("""
                     CREATE TABLE IF NOT EXISTS items (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL,
-                    quantity REAL NOT NULL,
+                    product_id INTEGER NOT NULL,
+                    quantity REAL NOT NULL CHECK (quantity > 0),
                     unit TEXT NOT NULL,
                     expiry_date DATE,
-                    creation_date DATETIME NOT NULL
+                    creation_date DATETIME NOT NULL,
+                    FOREIGN KEY (product_id) REFERENCES products(id)
                     );
                     """);
 
@@ -24,21 +33,21 @@ public class SchemaInitializer {
                     CREATE TABLE IF NOT EXISTS recipes (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
-                    instructions TEXT NOT NULL,
-                    servings INTEGER NOT NULL CHECK (servings > 0)
+                    servings INTEGER NOT NULL CHECK (servings > 0),
+                    instructions TEXT
                     );
                     """);
 
             stmt.execute("""
                     CREATE TABLE IF NOT EXISTS recipe_ingredients (
                     recipe_id INTEGER NOT NULL,
-                    item_id INTEGER NOT NULL,
+                    product_id INTEGER NOT NULL,
                     quantity REAL NOT NULL CHECK (quantity > 0),
                     unit TEXT NOT NULL,
                     
-                    PRIMARY KEY (recipe_id, item_id),
+                    PRIMARY KEY (recipe_id, product_id),
                     FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
-                    FOREIGN KEY (item_id) REFERENCES items(id)
+                    FOREIGN KEY (product_id) REFERENCES products(id)
                     );
                     """);
 

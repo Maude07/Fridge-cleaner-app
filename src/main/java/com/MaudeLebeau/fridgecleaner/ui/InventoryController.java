@@ -2,6 +2,7 @@ package com.MaudeLebeau.fridgecleaner.ui;
 
 import com.MaudeLebeau.fridgecleaner.domain.Item;
 import com.MaudeLebeau.fridgecleaner.repository.ItemRepository;
+import com.MaudeLebeau.fridgecleaner.repository.ProductRepository;
 import com.MaudeLebeau.fridgecleaner.service.ItemService;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -26,13 +27,18 @@ public class InventoryController {
     @FXML private TableColumn<Item, Void> actionsCol;
 
     private final ItemService itemService =
-            new ItemService(new ItemRepository());
+            new ItemService(new ItemRepository(new ProductRepository()));
 
     private final ObservableList<Item> items = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
-        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameCol.setCellValueFactory(cellData ->
+                new javafx.beans.property.SimpleStringProperty(
+                        cellData.getValue() != null && cellData.getValue().getProduct() != null
+                            ? cellData.getValue().getProduct().getName()
+                            : ""
+                ));
         quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         unitCol.setCellValueFactory(new PropertyValueFactory<>("unit"));
         expiryCol.setCellValueFactory(new PropertyValueFactory<>("expiryDate"));
@@ -56,7 +62,7 @@ public class InventoryController {
                 minusBtn.setOnAction(e -> {
                     Item item = getTableRow().getItem();
                     itemService.delete(item);
-                    System.out.println("MINUS on " + item.getName());
+                    System.out.println("MINUS on " + item.getProduct().getName());
                     refresh();
                 });
             }
@@ -86,7 +92,7 @@ public class InventoryController {
         // ex: I have an old milk carton, but I just bought a new one, keep old expiry date until used all of it
         Dialog<BigDecimal> dialog = new Dialog<>();
         dialog.setTitle("Ajouter une quantite");
-        dialog.setHeaderText("Item: " + item.getName());
+        dialog.setHeaderText("Item: " + item.getProduct().getName());
 
         ButtonType addBtnType = new ButtonType("Ajouter", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(addBtnType, ButtonType.CANCEL);
@@ -143,9 +149,10 @@ public class InventoryController {
 
         dialog.showAndWait().ifPresent(addQty -> {
             BigDecimal sum = addQty.add(item.getQuantity());
+
             itemService.update(new Item(
                     item.getId(),
-                    item.getName(),
+                    item.getProduct(),
                     sum,
                     item.getUnit(),
                     item.getExpiryDate(),

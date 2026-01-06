@@ -7,15 +7,15 @@ import java.util.Objects;
 
 public class Item {
     private final Long id;
-    private final String name;
+    private Product product;
     private BigDecimal quantity;
     private Unit unit;
     private LocalDate expiryDate;
     private LocalDateTime creationDate;
 
-    public Item(Long id, String name, BigDecimal quantity, Unit unit, LocalDate expiryDate) {
+    public Item(Long id, Product product,  BigDecimal quantity, Unit unit, LocalDate expiryDate) {
         this.id = id;
-        this.name = Objects.requireNonNull(name, "Item must have a name");
+        this.product = Objects.requireNonNull(product, "Item must reference a product");
         this.quantity = Objects.requireNonNull(quantity, "Item must have a quantity");
         this.unit = Objects.requireNonNull(unit, "Item must have a unit");
         this.expiryDate = expiryDate;
@@ -27,9 +27,9 @@ public class Item {
 
     }
 
-    public Item(Long id, String name, BigDecimal quantity, Unit unit, LocalDate expiryDate, LocalDateTime creationDate) {
+    public Item(Long id, Product product, BigDecimal quantity, Unit unit, LocalDate expiryDate, LocalDateTime creationDate) {
         this.id = id;
-        this.name = Objects.requireNonNull(name, "Item must have a name");
+        this.product = Objects.requireNonNull(product, "Item must reference a product");
         this.quantity = Objects.requireNonNull(quantity, "Item must have a quantity");
         this.unit = Objects.requireNonNull(unit, "Item must have a unit");
         this.expiryDate = expiryDate;
@@ -45,9 +45,7 @@ public class Item {
         return id;
     }
 
-    public String getName() {
-        return name;
-    }
+    public Product getProduct() { return product; }
 
     public BigDecimal getQuantity() {
         return quantity;

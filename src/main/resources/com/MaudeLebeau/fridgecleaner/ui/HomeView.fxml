@@ -50,11 +50,7 @@
         <Button text="Ajouter" onAction="#onAddRecipe" styleClass="secondary-button"/>
     </HBox>
 
-    <Label text="Ingredients" styleClass="sub-headline"/>
-
-    <VBox fx:id="ingredientsBox" spacing="8">
-
-    </VBox>
+    <fx:include fx:id="ingredientsEditor" source="IngredientEditor.fxml"/>
 
     <Label text="Instructions" styleClass="sub-headline"/>
 
@@ -63,7 +59,6 @@
     </VBox>
 
     <Label fx:id="statusLabel"
-           text=""
            wrapText="true"
            styleClass="status-message"/>
 

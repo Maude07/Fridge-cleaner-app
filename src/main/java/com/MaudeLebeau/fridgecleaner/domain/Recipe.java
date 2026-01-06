@@ -10,7 +10,7 @@ public class Recipe {
     private List<Ingredient> ingredientList;
     private String instructions;
 
-    public Recipe(Long id, String name, String instructions, Integer serving, List<Ingredient> ingredientList) {
+    public Recipe(Long id, String name, Integer serving, String instructions, List<Ingredient> ingredientList) {
         this.id = id;
         this.name = Objects.requireNonNull(name, "Recipe must have a name");
         this.instructions = Objects.requireNonNull(instructions, "Recipe must have instructions");
@@ -34,7 +34,7 @@ public class Recipe {
         return name;
     }
 
-    public Integer getServing() {
+    public Integer getServings() {
         return serving;
     }
 

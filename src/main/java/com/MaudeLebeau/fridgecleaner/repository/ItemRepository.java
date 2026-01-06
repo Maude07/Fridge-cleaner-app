@@ -1,6 +1,7 @@
 package com.MaudeLebeau.fridgecleaner.repository;
 
 import com.MaudeLebeau.fridgecleaner.domain.Item;
+import com.MaudeLebeau.fridgecleaner.domain.Product;
 import com.MaudeLebeau.fridgecleaner.domain.Unit;
 
 import java.sql.*;
@@ -10,9 +11,13 @@ import java.util.List;
 
 public class ItemRepository {
 
+    private final ProductRepository productRepository;
+
+    public ItemRepository(ProductRepository productRepository) { this.productRepository = productRepository; }
+
     public Item addItem(Item item) {
         String sql = """
-                INSERT INTO items (name, quantity, unit, expiry_date, creation_date)
+                INSERT INTO items (product_id, quantity, unit, expiry_date, creation_date)
                 VALUES (?, ?, ?, ?, ?)
                 """;
 
@@ -20,7 +25,7 @@ public class ItemRepository {
             PreparedStatement stmt =
                     conn.prepareStatement(sql,PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-            stmt.setString(1, item.getName());
+            stmt.setLong(1, item.getProduct().getId());
 
             stmt.setBigDecimal(2, item.getQuantity());
 
@@ -42,7 +47,7 @@ public class ItemRepository {
 
                     return new Item(
                             generatedId,
-                            item.getName(),
+                            item.getProduct(),
                             item.getQuantity(),
                             item.getUnit(),
                             item.getExpiryDate()
@@ -51,7 +56,6 @@ public class ItemRepository {
                     throw new SQLException("Failed to retrieve item generated ID");
                 }
             }
-
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting item", e);
         }
@@ -59,7 +63,7 @@ public class ItemRepository {
 
     public Item getItemById(Long id) {
         String sql = """
-                SELECT id, name, quantity, unit, expiry_date, creation_date
+                SELECT id, product_id, quantity, unit, expiry_date, creation_date
                 FROM items
                 WHERE id = ?
                 """;
@@ -77,9 +81,11 @@ public class ItemRepository {
                 Date expirySql = rs.getDate("expiry_date");
                 LocalDate expiryDate = (expirySql != null) ? expirySql.toLocalDate() : null;
 
+                Product product = productRepository.getProductById(rs.getLong("product_id"));
+
                 return new Item(
                         rs.getLong("id"),
-                        rs.getString("name"),
+                        product,
                         rs.getBigDecimal("quantity"),
                         Unit.valueOf(rs.getString("unit")),
                         expiryDate,
@@ -91,17 +97,19 @@ public class ItemRepository {
         }
     }
 
-    public Item getItemByName(String name) {
+    public Item getItemByProductId(Long id) {
         String sql = """
-                SELECT id, name, quantity, unit, expiry_date, creation_date
+                SELECT id, product_id, quantity, unit, expiry_date, creation_date
                 FROM items
-                WHERE name = ?
+                WHERE product_id = ?
                 """;
 
         try (Connection conn = DatabaseManager.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, name);
+            System.out.println("Connection made");
+
+            stmt.setLong(1, id);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (!rs.next()) {
@@ -111,9 +119,11 @@ public class ItemRepository {
                 Date expirySql = rs.getDate("expiry_date");
                 LocalDate expiryDate = (expirySql != null) ? expirySql.toLocalDate() : null;
 
+                Product product = productRepository.getProductById(id);
+
                 return new Item(
                         rs.getLong("id"),
-                        name,
+                        product,
                         rs.getBigDecimal("quantity"),
                         Unit.valueOf(rs.getString("unit")),
                         expiryDate,
@@ -121,13 +131,14 @@ public class ItemRepository {
                 );
             }
         } catch (SQLException e) {
+            System.out.println("No ResultSet");
             throw new RuntimeException("Error getting item by name", e);
         }
     }
 
     public List<Item> getAllItems() {
         String sql = """
-                SELECT id, name, quantity, unit, expiry_date, creation_date
+                SELECT id, product_id, quantity, unit, expiry_date, creation_date
                 FROM items
                 """;
 
@@ -140,9 +151,12 @@ public class ItemRepository {
 
                 Date expirySql = rs.getDate("expiry_date");
                 LocalDate expiryDate = (expirySql != null) ? expirySql.toLocalDate() : null;
+
+                Product product = productRepository.getProductById(rs.getLong("product_id"));
+
                 Item item = new Item(
                         rs.getLong("id"),
-                        rs.getString("name"),
+                        product,
                         rs.getBigDecimal("quantity"),
                         Unit.valueOf(rs.getString("unit")),
                         expiryDate
@@ -165,27 +179,25 @@ public class ItemRepository {
 
         String sql = """
                 UPDATE items
-                SET name=?, quantity=?, unit=?, expiry_date=?
+                SET quantity=?, unit=?, expiry_date=?
                 WHERE id=?
                 """;
 
         try (Connection conn = DatabaseManager.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, item.getName());
+            stmt.setBigDecimal(1, item.getQuantity());
 
-            stmt.setBigDecimal(2, item.getQuantity());
-
-            stmt.setString(3, item.getUnit().name());
+            stmt.setString(2, item.getUnit().name());
 
             if (item.getExpiryDate() != null) {
-                stmt.setDate(4, Date.valueOf(item.getExpiryDate()));
+                stmt.setDate(3, Date.valueOf(item.getExpiryDate()));
             } else {
-                stmt.setNull(4, Types.DATE);
+                stmt.setNull(3, Types.DATE);
             }
 
             if (item.getId() != null) {
-                stmt.setLong(5, item.getId());
+                stmt.setLong(4, item.getId());
             }
 
             int rows = stmt.executeUpdate();

@@ -6,12 +6,14 @@ import com.MaudeLebeau.fridgecleaner.service.RecipeService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 
 public class RecipeController {
 
@@ -38,14 +40,47 @@ public class RecipeController {
             {
                 plusBtn.setOnAction(e -> {
 
+                    Recipe recipe = getTableRow().getItem();
+                    if (recipe == null) {
+                        return;
+                    }
+                    refresh();
                 });
 
                 minusBtn.setOnAction(e -> {
                     Recipe recipe = getTableRow().getItem();
-                    recipeService.
-                })
+                    recipeService.deleteRecipe(recipe.getId());
+                    System.out.println("MINUS on " + recipe.getName());
+                    refresh();
+                });
             }
 
+            @Override
+            protected void updateItem(Void ignored, boolean empty) {
+                super.updateItem(ignored, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(box);
+                }
+            }
         });
+
+        recipesTable.setItems(recipes);
+        refresh();
     }
+
+    public void refresh() { recipes.setAll(recipeService.listAll());}
+
+//    private void openRecipeEditor() {
+//        try {
+//            FXMLLoader loader = new FXMLLoader(
+//                    getClass().getResource(
+//                            "/com/MaudeLebeau/fridgecleaner/ui/RecipeEditorPane.fxml"));
+//            Parent root = loader.load();
+//            Stage stage = new Stage();
+//            stage.setTitle("Modificateur de recette");
+//            stage.setScene(new Scene(root))
+//        }
+//    }
 }

@@ -25,8 +25,8 @@ public class ItemService {
         return repo.updateItem(item);
     }
 
-    public Item findItemByName(String name) {
-        return repo.getItemByName(name);
+    public Item findItemByProductId(Long id) {
+        return repo.getItemByProductId(id);
     }
 
     public List<Item> listAll() {
