@@ -8,12 +8,8 @@ import com.MaudeLebeau.fridgecleaner.repository.RecipeRepository;
 import com.MaudeLebeau.fridgecleaner.service.ItemService;
 import com.MaudeLebeau.fridgecleaner.service.RecipeService;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.math.BigDecimal;
