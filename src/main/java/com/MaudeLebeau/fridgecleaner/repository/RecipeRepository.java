@@ -209,4 +209,69 @@ public class RecipeRepository {
             throw new RuntimeException("Error deleting recipe id = " + id, e);
         }
     }
+
+    public boolean updateRecipe(Recipe recipe) {
+        if (recipe.getId() == null) {
+            throw new IllegalArgumentException("Cannot update recipe without Id");
+        }
+
+        String recipeSql = """
+                UPDATE recipes
+                SET name = ?, servings = ?, instructions = ?
+                WHERE id = ?
+                """;
+
+        String deleteIngSql = """
+                DELETE FROM recipe_ingredients
+                WHERE recipe_id = ?
+                """;
+
+        String addIngSql = """
+                INSERT INTO recipe_ingredients(recipe_id, product_id, quantity, unit)
+                VALUES (?, ?, ?, ?)
+                """;
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            conn.setAutoCommit(false);
+
+            try {
+                try (PreparedStatement stmt = conn.prepareStatement(recipeSql)) {
+                    stmt.setString(1, recipe.getName());
+                    stmt.setInt(2, recipe.getServings());
+                    stmt.setString(3, recipe.getInstructions());
+                    stmt.setLong(4, recipe.getId());
+                    stmt.executeUpdate();
+                }
+
+                try (PreparedStatement stmt = conn.prepareStatement(deleteIngSql)) {
+                    stmt.setLong(1, recipe.getId());
+                    stmt.executeUpdate();
+                }
+
+                if (recipe.getIngredientList() != null && !recipe.getIngredientList().isEmpty()) {
+                    try (PreparedStatement stmt = conn.prepareStatement(addIngSql)) {
+                        for (Ingredient ing : recipe.getIngredientList()) {
+                            stmt.setLong(1, recipe.getId());
+                            stmt.setLong(2, ing.getProduct().getId());
+                            stmt.setBigDecimal(3, ing.getQuantity());
+                            stmt.setString(4, ing.getUnit().toString());
+                            stmt.addBatch();
+                        }
+                        stmt.executeBatch();
+                    }
+                }
+
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error updating recipe id = " + recipe.getId(), e);
+        }
+
+    }
 }

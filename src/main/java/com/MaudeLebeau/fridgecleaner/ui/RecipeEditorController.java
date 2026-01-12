@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.util.List;
 
@@ -33,10 +34,12 @@ public class RecipeEditorController {
         servingsField.setText(String.valueOf(recipe.getServings()));
         instructionsField.setText(recipe.getInstructions());
 
+        if (ingredientsEditorController != null) {
+            ingredientsEditorController.setIngredients(recipe.getIngredientList());
+        }
     }
 
     @FXML private void onSave() {
-
         try {
             String name = nameField.getText();
             Integer servings = Integer.parseInt(servingsField.getText());
@@ -44,13 +47,27 @@ public class RecipeEditorController {
 
             List<Ingredient> ingredients = ingredientsEditorController.collectIngredients();
 
+            if (editingRecipe != null) {
+                Recipe updatedRecipe = new Recipe(editingRecipe.getId(),
+                        name, servings, recipeInstructions, ingredients);
+
+                Boolean updated = recipeService.updateRecipe(updatedRecipe);
+                if (updated) {
+                    Stage stage = (Stage) nameField.getScene().getWindow();
+                    stage.close();
+                } else {
+                    System.out.println("Failed to update recipe" + name);
+                }
+            }
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @FXML private void onCancel() {
-
+        Stage stage = (Stage) nameField.getScene().getWindow();
+        stage.close();
     }
 
 

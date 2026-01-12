@@ -19,4 +19,8 @@ public class RecipeService {
     public Boolean deleteRecipe(Long id) {
         return repo.deleteRecipeById(id);
     }
+
+    public Boolean updateRecipe(Recipe recipe) {
+        return repo.updateRecipe(recipe);
+    }
 }

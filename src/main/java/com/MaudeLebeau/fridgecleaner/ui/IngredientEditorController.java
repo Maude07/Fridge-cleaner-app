@@ -91,7 +91,18 @@ public class IngredientEditorController {
     }
 
     private void addIngredientRowPrefilled(String name, String quantity, Unit unit) {
+        HBox row = buildIngredientRow();
 
+        TextField nameField = (TextField) row.getChildren().get(0);
+        TextField quantityField = (TextField) row.getChildren().get(1);
+        @SuppressWarnings("unchecked")
+                ComboBox<Unit> unitField = (ComboBox<Unit>) row.getChildren().get(2);
+
+        nameField.setText(name);
+        quantityField.setText(quantity);
+        unitField.setValue(unit);
+
+        ingredientsBox.getChildren().add(row);
     }
 
     private void addIngredientRow() {
