@@ -73,6 +73,27 @@ public class IngredientEditorController {
         return ingredients;
     }
 
+    public void setIngredients(List<Ingredient> ingredients) {
+        ingredientsBox.getChildren().clear();
+
+        if (ingredients == null || ingredients.isEmpty()) {
+            addIngredientRow();
+            return;
+        }
+
+        for (Ingredient ing : ingredients) {
+            addIngredientRowPrefilled(
+                    ing.getProduct().getName(),
+                    ing.getQuantity().toString(),
+                    ing.getUnit()
+            );
+        }
+    }
+
+    private void addIngredientRowPrefilled(String name, String quantity, Unit unit) {
+
+    }
+
     private void addIngredientRow() {
         HBox row = buildIngredientRow();
         ingredientsBox.getChildren().add(row);

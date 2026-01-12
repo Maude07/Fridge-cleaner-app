@@ -1,9 +1,7 @@
 package com.MaudeLebeau.fridgecleaner.ui;
 
 import com.MaudeLebeau.fridgecleaner.domain.Ingredient;
-import com.MaudeLebeau.fridgecleaner.domain.Unit;
-import com.MaudeLebeau.fridgecleaner.repository.ItemRepository;
-import com.MaudeLebeau.fridgecleaner.repository.ProductRepository;
+import com.MaudeLebeau.fridgecleaner.domain.Recipe;
 import com.MaudeLebeau.fridgecleaner.repository.RecipeRepository;
 import com.MaudeLebeau.fridgecleaner.service.ItemService;
 import com.MaudeLebeau.fridgecleaner.service.RecipeService;
@@ -12,23 +10,30 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 public class RecipeEditorController {
     @FXML private TextField nameField;
     @FXML private TextField servingsField;
     @FXML private TextArea instructionsField;
-    @FXML private VBox ingredientsBox;
-    @FXML private IngredientEditorController ingredientsEditor;
 
-    private final ItemService itemService = new ItemService(new ItemRepository(new ProductRepository()));
+    @FXML private VBox ingredientsEditor;
+    @FXML private IngredientEditorController ingredientsEditorController;
+
     private final RecipeService recipeService = new RecipeService(new RecipeRepository());
+    private Recipe editingRecipe;
 
     public void initialize() {
     }
 
+    public void setRecipe(Recipe recipe) {
+        this.editingRecipe = recipe;
+
+        nameField.setText(recipe.getName());
+        servingsField.setText(String.valueOf(recipe.getServings()));
+        instructionsField.setText(recipe.getInstructions());
+
+    }
 
     @FXML private void onSave() {
 
@@ -37,7 +42,7 @@ public class RecipeEditorController {
             Integer servings = Integer.parseInt(servingsField.getText());
             String recipeInstructions = instructionsField.getText();
 
-            List<Ingredient> ingredients = ingredientsEditor.collectIngredients();
+            List<Ingredient> ingredients = ingredientsEditorController.collectIngredients();
 
         } catch (Exception e) {
             throw new RuntimeException(e);
