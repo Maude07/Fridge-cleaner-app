@@ -2,8 +2,9 @@ package com.MaudeLebeau.fridgecleaner.ui;
 
 import com.MaudeLebeau.fridgecleaner.domain.Ingredient;
 import com.MaudeLebeau.fridgecleaner.domain.Recipe;
+import com.MaudeLebeau.fridgecleaner.repository.ItemRepository;
+import com.MaudeLebeau.fridgecleaner.repository.ProductRepository;
 import com.MaudeLebeau.fridgecleaner.repository.RecipeRepository;
-import com.MaudeLebeau.fridgecleaner.service.ItemService;
 import com.MaudeLebeau.fridgecleaner.service.RecipeService;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextArea;
@@ -21,7 +22,7 @@ public class RecipeEditorController {
     @FXML private VBox ingredientsEditor;
     @FXML private IngredientEditorController ingredientsEditorController;
 
-    private final RecipeService recipeService = new RecipeService(new RecipeRepository());
+    private final RecipeService recipeService = new RecipeService(new RecipeRepository(), new ItemRepository(new ProductRepository()));
     private Recipe editingRecipe;
 
     public void initialize() {

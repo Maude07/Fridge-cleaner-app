@@ -29,7 +29,7 @@ public class HomeController {
     @FXML private IngredientEditorController ingredientsEditorController;
 
     private final ItemService itemService = new ItemService(new ItemRepository(new ProductRepository()));
-    private final RecipeService recipeService = new RecipeService(new RecipeRepository());
+    private final RecipeService recipeService = new RecipeService(new RecipeRepository(), new ItemRepository(new ProductRepository()));
     private final ProductService productService = new ProductService(new ProductRepository());
 
 

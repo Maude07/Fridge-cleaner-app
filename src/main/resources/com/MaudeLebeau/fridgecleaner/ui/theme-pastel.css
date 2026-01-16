@@ -148,3 +148,20 @@
 .qty-minus:hover {
     -fx-background-color: #FFC9D2;
 }
+
+.table-row-cell.recipe-ready {
+    -fx-background-color: rgba(76, 175, 80, 0.18);
+}
+.table-row-cell.recipe-almost {
+    -fx-background-color: rgba(255, 152, 0, 0.18);
+}
+.table-row-cell.recipe-unavailable {
+    -fx-background-color: rgba(244, 67, 54, 0.18);
+}
+
+/* optionnel: quand la row est sélectionnée, évite que ça devienne illisible */
+.table-row-cell:filled:selected,
+.table-row-cell:filled:selected .text {
+    -fx-fill: -fx-text-base-color;
+}
+

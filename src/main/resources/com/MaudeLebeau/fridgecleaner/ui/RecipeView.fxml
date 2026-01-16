@@ -18,8 +18,10 @@
 
     <TableView fx:id="recipesTable" VBox.vgrow="ALWAYS">
         <columns>
+            <TableColumn fx:id="statusCol" text="État" prefWidth="120"/>
             <TableColumn fx:id="nameCol" text="Nom" prefWidth="480"/>
             <TableColumn fx:id="servingsCol" text="Portions" prefWidth="140"/>
+            <TableColumn fx:id="missingCol" text="Manquants" prefWidth="110"/>
             <TableColumn fx:id="actionsCol" prefWidth="90"/>
         </columns>
     </TableView>
